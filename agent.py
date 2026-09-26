@@ -25,7 +25,6 @@ class auto_sorting_agent:
         self.__done_ids = set() #Messages already decided on. In dry run they stay in the inbox, so without this they'd be sent to the AI every loop
         lookback = 24*60*60 if dry_run else 120 #Dry run looks at the last day so there's something to show straight away
         self.__last_check = int(time.time()) - lookback
-        self.__protected_labels = ["SENT", "DRAFTS", "UNREAD", "TRASH","UNREAD"] #These labels can't be removed. (set by google, I added unread on there so it remains unread for the user.
         self.__client = OpenAI()
         self.run_agent()
 
@@ -86,16 +85,16 @@ class auto_sorting_agent:
                 "type": "text",
                 "text": data.decode("utf-8", errors="replace")
             }
-        elif file_type.startswith("image/"):
+        elif file_type in ("image/png", "image/jpeg", "image/gif", "image/webp"): #The formats the model accepts
             return {
-                    "type": "image_url", 
+                    "type": "image_url",
                     "image_url": {
-                    "url": f"data:image/png;base64,{base64.b64encode(data).decode('utf-8')}"
+                    "url": f"data:{file_type};base64,{base64.b64encode(data).decode('utf-8')}"
             }}
         elif attachment_dict.get("filename", "").endswith(".json"):
             return {
                     "type": "text",
-                    "text": f"--- Attached JSON File ({attachment_dict.get('filename', '')}) ---\n{data.decode('utf-8')}"
+                    "text": f"--- Attached JSON File ({attachment_dict.get('filename', '')}) ---\n{data.decode('utf-8', errors='replace')}"
                 }
         else:
             return {
@@ -116,8 +115,9 @@ class auto_sorting_agent:
     def decide_action(self,inputs):
         completion = self.__client.beta.chat.completions.parse(
             model = "gpt-4o-mini",
-            messages = [{"role": "system", "content": "Your goal is determine where the email should be moved to. Respond with spam if you believe you got an automated message,"
-            " important if the message is important and misc for anything else."},
+            messages = [{"role": "system", "content": "Your goal is to determine where the email should be moved to. Respond with spam for unsolicited, scam, phishing or bulk marketing emails,"
+            " important for emails that need the user's attention or action, such as personal messages, work, deadlines, security alerts and bills,"
+            " and misc for anything else, including routine automated notifications like receipts and newsletters the user signed up for."},
                         {"role": "user", "content": inputs}],
             response_format = DecideAction, #Restrict its output so it can only respond with important/spam/misc
             temperature=0 #its sorting so 0 makes it more optimised
@@ -132,10 +132,8 @@ class auto_sorting_agent:
             "misc": self.__misc_label_id
         }   
         new_label = labels[decision]
-        message_labels_to_remove = self.__service.users().messages().get(userId="me",id=message_id).execute().get("labelIds",[])
-        message_labels_to_remove = [label for label in message_labels_to_remove if label not in self.__protected_labels and label != new_label]
-        change_labels = {
-            "removeLabelIds": message_labels_to_remove,
+        change_labels = { #Only take it out of the inbox, so the user's own labels are kept
+            "removeLabelIds": ["INBOX"],
             "addLabelIds": [new_label]
         }
         self.__service.users().messages().modify(userId="me",id=message_id,body=change_labels).execute()
@@ -166,12 +164,17 @@ class auto_sorting_agent:
             try:
                 check_start = int(time.time())
                 query = f"is:inbox after:{self.__last_check}" #Everything since the last check, so nothing is missed however long a pass takes
-                self.__results = self.__service.users().messages().list(userId="me",q=query).execute()
+                message_dicts = []
+                page_token = None
+                while True: #Results come in pages, keep going until every page has been read
+                    response = self.__service.users().messages().list(userId="me",q=query,pageToken=page_token).execute()
+                    message_dicts.extend(response.get("messages",[]))
+                    page_token = response.get("nextPageToken")
+                    if not page_token:
+                        break
                 self.__last_check = check_start - 60 #Only move forward once listing worked. 60s overlap in case Gmail is slow to index new emails
-                #self.__results = self.__service.users().messages().list(userId="me",q="is:unread").execute()
-                if self.__results:
-                    message_dicts = self.__results.get("messages",[])
-                    print(len(message_dicts))
+                if message_dicts:
+                    print(f"Found {len(message_dicts)} email(s) to check")
                     for message_dict in message_dicts:
                         if message_dict["id"] in self.__failed_ids or message_dict["id"] in self.__done_ids: #Already handled, don't pay again
                             continue
@@ -193,9 +196,10 @@ class auto_sorting_agent:
                         except Exception as e:
                             self.__failed_ids.add(message_dict["id"])
                             print("Failed on message", message_dict["id"], ":", e)
+                else:
+                    print("No new emails")
             except Exception as e: #Listing messages failed, try again next loop
                 print(e)
-            print("No emails currently")
             time.sleep(100)
 
 
