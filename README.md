@@ -9,7 +9,10 @@ To use:
 5. Go to Credentials and click credentials. Choose OAuth Client ID. Choose Desktop app and create.
 6. Click download json and save the file as credentials.json.
 7. Create a .env file, and paste an API key.
-8. Do pip install -r requirements.txt (you may want do make a venv for this)
+8. Do pip install -r requirements.txt (you may want to make a venv for this)
 9. To run: just run python/python3 agent.py in the command line. You may be asked to login if you are running the program for the first time.
+10. To try it without changing your inbox, run python/python3 agent.py --dry-run instead (see below).
 
-This program will attempt to sort emails into 3 categories: Important, Spam and misc. (It will create a misc label if it doesn't exist). It will move the message from inbox to the appropriate label.
+There is a dry run mode, which can be run by adding the --dry-run flag. It will not move the email but show where the email would be sorted to by printing Would move ... -> ... 
+
+This program will attempt to sort emails into 3 categories: Important, Spam and misc. (It will create a misc label if it doesn't exist). It will move the message from inbox to the appropriate label. An existing limitation is that this will remove all users' labels, and by extension all automated email goes to spam.
