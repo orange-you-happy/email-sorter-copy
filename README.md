@@ -1,5 +1,5 @@
 # email-sorter
-This may fail, I hope it doesn't. Also this requires an API key from OpenAI
+This program will attempt to sort emails into 3 categories: Important, Spam and misc. (It will create a misc label if it doesn't exist). It will move the message from inbox to the appropriate label. An existing limitation is that this will remove all users' labels, and by extension all automated email goes to spam.
 
 To use:
 1. Go to google cloud console and create a project.
@@ -15,4 +15,4 @@ To use:
 
 There is a dry run mode, which can be run by adding the --dry-run flag. It will not move the email but show where the email would be sorted to by printing Would move ... -> ... 
 
-This program will attempt to sort emails into 3 categories: Important, Spam and misc. (It will create a misc label if it doesn't exist). It will move the message from inbox to the appropriate label. An existing limitation is that this will remove all users' labels, and by extension all automated email goes to spam.
+
