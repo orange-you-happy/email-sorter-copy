@@ -1,9 +1,7 @@
 # email-sorter
-<<<<<<< HEAD
 This program will attempt to sort emails into 3 categories: Important, Spam and misc. (It will create a misc label if it doesn't exist). It will move the message from inbox to the appropriate label. An existing limitation is that this will remove all users' labels, and by extension all automated email goes to spam.
 =======
 An AI agent that watches your Gmail inbox and sorts new emails into Important, Spam and misc using GPT-4o-mini. It reads the sender, subject, body and supported attachments (text, JSON and images) to decide. Requires an OpenAI API key.
->>>>>>> 677f2c9 (fixes)
 
 To use:
 1. Go to google cloud console and create a project.
