@@ -17,8 +17,5 @@ To use:
 
 There is a dry run mode, which can be run by adding the --dry-run flag. It will not move the email but show where the email would be sorted to by printing Would move ... -> ... 
 
-<<<<<<< HEAD
-
-=======
 This program will attempt to sort emails into 3 categories: Important, Spam and misc. (It will create a misc label if it doesn't exist). It will move the message from the inbox to the appropriate label. Any labels you have already added to an email are kept. Routine automated emails such as receipts and notifications go to misc, while scams, phishing and bulk marketing go to spam.
->>>>>>> 677f2c9 (fixes)
+
