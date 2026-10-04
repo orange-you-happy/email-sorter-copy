@@ -10,7 +10,7 @@ To use:
 5. Add the email you will be using the sorter on.
 6. Go to Credentials and click credentials. Choose OAuth Client ID. Choose Desktop app and create.
 7. Click download json and save the file as credentials.json.
-8. Create a .env file, and paste an API key.
+8. Create a .env file, and onto it type: OPENAI_API_KEY = <key>
 9. Do pip install -r requirements.txt (you may want to make a venv for this)
 10. To run: just run python/python3 agent.py in the command line. You may be asked to login if you are running the program for the first time.
 11. To try it without changing your inbox, run python/python3 agent.py --dry-run instead (see below).
