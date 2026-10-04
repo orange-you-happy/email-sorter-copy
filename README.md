@@ -9,9 +9,10 @@ To use:
 1. Go to console.cloud.google.com and create a project. 
 2. Enable the gmail API in APIs & Services 
 3. Go to the OAuth consent screen and fill in the app name, user type, and the required emails.
-5. Add the email you will be using the sorter on.
-6. Go to Credentials and click credentials. Choose OAuth Client ID. Choose Desktop app and create.
-7. Click download json and save the file as credentials.json.
+4. Add the email you will be using the sorter on.
+5. Go to Credentials and click credentials. Choose OAuth Client ID. Choose Desktop app and create.
+6. Click download json and save the file as credentials.json.
+7. Go to audience and add the email you will be using the sorter on. 
 8. Create a .env file, and onto it type: OPENAI_API_KEY = <key>
 9. Do pip install -r requirements.txt (you may want to make a venv for this)
 10. To run: just run python/python3 agent.py in the command line. You may be asked to login if you are running the program for the first time.
