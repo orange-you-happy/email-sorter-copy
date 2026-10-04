@@ -3,6 +3,8 @@ This program will attempt to sort emails into 3 categories: Important, Spam and 
 
 An AI agent that watches your Gmail inbox and sorts new emails into Important, Spam and misc using GPT-4o-mini. It reads the sender, subject, body and supported attachments (text, JSON and images) to decide. Requires an OpenAI API key.
 
+Video to setup: https://youtu.be/nQgCgQTdooM
+
 To use:
 1. Go to console.cloud.google.com and create a project. 
 2. Enable the gmail API in APIs & Services 
